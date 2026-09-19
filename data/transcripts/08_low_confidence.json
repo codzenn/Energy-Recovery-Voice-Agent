@@ -1,0 +1,9 @@
+{
+  "synthetic":true,"scenario":"low_confidence","title":"Low Confidence","call_id":"fixture-confidence","lead_id":"syn-ambiguous-02",
+  "expected_status":"HANDOFF","expected_reason":"LOW_CONFIDENCE",
+  "turns":[
+    {"speaker":"agent","text":"This call is recorded. May we continue?","timestamp":"2026-09-19T11:10:00Z"},
+    {"speaker":"customer","text":"Yes.","timestamp":"2026-09-19T11:10:03Z"},
+    {"speaker":"customer","text":"Three... sorry, the line is breaking up... 3000.","confidence":0.35,"timestamp":"2026-09-19T11:10:08Z"}
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "synthetic": true, "scenario": "happy_path", "title": "Happy Path", "call_id": "fixture-happy", "lead_id": "syn-happy-01",
+  "expected_status": "COMPLETED", "expected_reason": null,
+  "turns": [
+    {"speaker":"agent","text":"This synthetic recovery call is recorded. Is it okay to continue?","timestamp":"2026-09-19T10:00:00Z"},
+    {"speaker":"customer","text":"Yes, go ahead.","timestamp":"2026-09-19T10:00:03Z"},
+    {"speaker":"customer","text":"No, electricity only.","timestamp":"2026-09-19T10:00:09Z"},
+    {"speaker":"customer","text":"Yes, we do have solar panels.","timestamp":"2026-09-19T10:00:15Z"},
+    {"speaker":"customer","text":"It's 6 kilowatts.","timestamp":"2026-09-19T10:00:20Z"},
+    {"speaker":"customer","text":"Wait.","timestamp":"2026-09-19T10:00:23Z"},
+    {"speaker":"customer","text":"Can you repeat that?","timestamp":"2026-09-19T10:00:27Z"},
+    {"speaker":"customer","text":"Um, 2026-02-30.","timestamp":"2026-09-19T10:00:32Z"},
+    {"speaker":"customer","text":"Sorry, I mean 2026-10-01.","timestamp":"2026-09-19T10:00:39Z"},
+    {"speaker":"customer","text":"My email is alex at example dot test","timestamp":"2026-09-19T10:00:45Z"},
+    {"speaker":"customer","text":"Actually, alex.demo@example.test","timestamp":"2026-09-19T10:00:49Z"},
+    {"speaker":"customer","text":"Yes.","timestamp":"2026-09-19T10:00:52Z"},
+    {"speaker":"customer","text":"Yes, that's correct.","timestamp":"2026-09-19T10:00:58Z"}
+  ]
+}

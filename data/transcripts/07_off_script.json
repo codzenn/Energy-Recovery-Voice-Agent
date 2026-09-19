@@ -1,0 +1,9 @@
+{
+  "synthetic":true,"scenario":"off_script","title":"Off Script / Advice","call_id":"fixture-advice","lead_id":"syn-happy-02",
+  "expected_status":"HANDOFF","expected_reason":"ADVICE_REQUEST",
+  "turns":[
+    {"speaker":"agent","text":"This call is recorded. May we continue?","timestamp":"2026-09-19T11:00:00Z"},
+    {"speaker":"customer","text":"Yes.","timestamp":"2026-09-19T11:00:03Z"},
+    {"speaker":"customer","text":"Which energy plan should I choose? Is this financially better?","timestamp":"2026-09-19T11:00:08Z"}
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "journey_id": "energy-demo",
+  "lead_id": "syn-happy-01",
+  "synthetic": true,
+  "fields": {
+    "customer_name": "Alex Demo",
+    "postcode": "3000",
+    "property_address": "10 Fiction Lane, Demo Town",
+    "dwelling_type": "house",
+    "current_energy_provider": "Demo North",
+    "electricity_connection_type": "existing",
+    "gas_required": false,
+    "solar_present": true,
+    "solar_system_kw": 6,
+    "move_in_date": "2026-10-01",
+    "email": "alex.demo@example.test"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "synthetic":true,"scenario":"not_interested","title":"Not Interested","call_id":"fixture-decline","lead_id":"syn-decline-01",
+  "expected_status":"ENDED","expected_reason":null,
+  "turns":[
+    {"speaker":"agent","text":"This call is recorded. May we continue?","timestamp":"2026-09-19T10:40:00Z"},
+    {"speaker":"customer","text":"I'm not interested. Don't want this.","timestamp":"2026-09-19T10:40:04Z"}
+  ]
+}

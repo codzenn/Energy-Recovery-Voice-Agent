@@ -1,0 +1,11 @@
+{
+  "synthetic":true,"scenario":"frustrated","title":"Frustrated Customer","call_id":"fixture-frustrated","lead_id":"syn-frustrated-01",
+  "expected_status":"HANDOFF","expected_reason":"REPEATED_COMPLAINT",
+  "turns":[
+    {"speaker":"agent","text":"This call is recorded. May we continue?","timestamp":"2026-09-19T10:10:00Z"},
+    {"speaker":"customer","text":"Okay.","timestamp":"2026-09-19T10:10:03Z"},
+    {"speaker":"customer","text":"The postcode is 3000.","timestamp":"2026-09-19T10:10:08Z"},
+    {"speaker":"customer","text":"Yes.","timestamp":"2026-09-19T10:10:12Z"},
+    {"speaker":"customer","text":"I've already told you this three times. You're not listening.","timestamp":"2026-09-19T10:10:18Z"}
+  ]
+}

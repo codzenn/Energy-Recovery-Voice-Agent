@@ -1,0 +1,10 @@
+{
+  "synthetic":true,"scenario":"human_request","title":"Human Request","call_id":"fixture-human","lead_id":"syn-human-01",
+  "expected_status":"HANDOFF","expected_reason":"EXPLICIT_HUMAN_REQUEST",
+  "turns":[
+    {"speaker":"agent","text":"This call is recorded. May we continue?","timestamp":"2026-09-19T10:20:00Z"},
+    {"speaker":"customer","text":"Yes.","timestamp":"2026-09-19T10:20:03Z"},
+    {"speaker":"customer","text":"Wait.","timestamp":"2026-09-19T10:20:07Z"},
+    {"speaker":"customer","text":"I want to speak to a person.","timestamp":"2026-09-19T10:20:10Z"}
+  ]
+}

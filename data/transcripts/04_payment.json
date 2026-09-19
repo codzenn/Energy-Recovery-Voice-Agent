@@ -1,0 +1,9 @@
+{
+  "synthetic":true,"scenario":"payment","title":"Payment Safety","call_id":"fixture-payment","lead_id":"syn-payment-01",
+  "expected_status":"HANDOFF","expected_reason":"PAYMENT",
+  "turns":[
+    {"speaker":"agent","text":"This call is recorded. May we continue?","timestamp":"2026-09-19T10:30:00Z"},
+    {"speaker":"customer","text":"Yes.","timestamp":"2026-09-19T10:30:03Z"},
+    {"speaker":"customer","text":"Can I give you my card number?","timestamp":"2026-09-19T10:30:08Z"}
+  ]
+}

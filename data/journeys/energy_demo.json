@@ -1,0 +1,20 @@
+{
+  "journey_id": "energy-demo",
+  "version": "1",
+  "synthetic": true,
+  "description": "Synthetic hackathon Energy comparison, not production CIMET data or advice.",
+  "fields": [
+    {"name":"customer_name","type":"text","step":"identity","required":true,"script":"What name should I use for this synthetic comparison?","clarification":"Please give your demo first and last name.","confirmation":"I heard {value}.","validation":{"min_length":3,"max_length":80},"retry_limit":2},
+    {"name":"postcode","type":"postcode","step":"location","required":true,"script":"What is the four-digit postcode for the property?","clarification":"Please give four digits, for example 3000.","confirmation":"The postcode is {value}. Is that correct?","confirm_required":true,"validation":{},"retry_limit":2},
+    {"name":"property_address","type":"text","step":"address","required":true,"script":"What is the synthetic property address?","clarification":"Use a made-up street number and street name.","confirmation":"I have {value}.","validation":{"min_length":5,"max_length":160},"retry_limit":2},
+    {"name":"dwelling_type","type":"enum","step":"property","required":true,"script":"Is the property a house, apartment, or townhouse?","clarification":"The available demo choices are house, apartment, and townhouse.","confirmation":"I have {value}.","choices":["house","apartment","townhouse"],"validation":{},"retry_limit":2},
+    {"name":"current_energy_provider","type":"enum","step":"supply","required":true,"script":"Which demo provider are you with: Demo North, Demo South, or other?","clarification":"These are fictional providers. Say Demo North, Demo South, or other.","confirmation":"Your demo provider is {value}.","choices":["Demo North","Demo South","other"],"validation":{},"retry_limit":2},
+    {"name":"electricity_connection_type","type":"enum","step":"electricity","required":true,"script":"Is this an existing electricity connection or a new connection?","clarification":"Please say existing or new.","confirmation":"I have an {value} connection.","choices":["existing","new"],"validation":{},"retry_limit":2},
+    {"name":"gas_required","type":"boolean","step":"gas","required":true,"script":"Would you like gas included in this synthetic comparison?","clarification":"Say yes to include gas or no for electricity only.","confirmation":"Gas required: {value}.","validation":{},"retry_limit":2},
+    {"name":"gas_connection_type","type":"enum","step":"gas_connection","required":true,"script":"For gas, is the connection existing or new?","clarification":"Please say existing or new for gas.","confirmation":"Gas connection: {value}.","choices":["existing","new"],"validation":{},"retry_limit":2,"branch":{"field":"gas_required","equals":true}},
+    {"name":"solar_present","type":"boolean","step":"solar","required":true,"script":"Does the property have solar panels?","clarification":"Please say yes or no.","confirmation":"Solar present: {value}.","validation":{},"retry_limit":2},
+    {"name":"solar_system_kw","type":"integer","step":"solar_size","required":true,"script":"What is the solar system size in whole kilowatts for this demo?","clarification":"Please give a whole number between 1 and 30.","confirmation":"Solar size: {value} kilowatts.","validation":{"minimum":1,"maximum":30},"retry_limit":2,"branch":{"field":"solar_present","equals":true}},
+    {"name":"move_in_date","type":"date","step":"move","required":true,"script":"What move-in date should I use? Please say year, month, and day as YYYY-MM-DD.","clarification":"Use a real calendar date in YYYY-MM-DD format.","confirmation":"Move-in date: {value}.","validation":{},"retry_limit":3},
+    {"name":"email","type":"email","step":"contact","required":true,"script":"What synthetic email address should I use?","clarification":"Use an example.test address, such as alex@example.test. You may say at and dot.","confirmation":"The email is {value}. Is that correct?","confirm_required":true,"validation":{"pattern":"[^\\s@]+@example\\.test"},"retry_limit":2}
+  ]
+}

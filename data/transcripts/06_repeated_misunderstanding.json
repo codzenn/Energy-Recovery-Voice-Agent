@@ -1,0 +1,10 @@
+{
+  "synthetic":true,"scenario":"repeated_misunderstanding","title":"Repeated Misunderstanding","call_id":"fixture-misunderstanding","lead_id":"syn-ambiguous-01",
+  "expected_status":"HANDOFF","expected_reason":"REPEATED_MISUNDERSTANDING",
+  "turns":[
+    {"speaker":"agent","text":"This call is recorded. May we continue?","timestamp":"2026-09-19T10:50:00Z"},
+    {"speaker":"customer","text":"Yes.","timestamp":"2026-09-19T10:50:03Z"},
+    {"speaker":"customer","text":"I'm not sure, somewhere near the city.","timestamp":"2026-09-19T10:50:08Z"},
+    {"speaker":"customer","text":"Um, I don't know the digits.","timestamp":"2026-09-19T10:50:15Z"}
+  ]
+}
