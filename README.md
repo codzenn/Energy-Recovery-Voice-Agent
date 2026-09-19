@@ -19,21 +19,79 @@ The agent starts with a synthetic dropped-off lead, obtains consent, asks only f
 - Warm handoff context containing progress, remaining fields, reason, and transcript.
 - Synthetic CLI scenarios and browser-level voice tests.
 
+## Explore The System
+
+| Area                     | Start here                                                                             |
+| ------------------------ | -------------------------------------------------------------------------------------- |
+| Browser voice capture    | [`apps/web/lib/voice-session.ts`](apps/web/lib/voice-session.ts)                       |
+| Dashboard                | [`apps/web/app/page.tsx`](apps/web/app/page.tsx)                                       |
+| API composition root     | [`apps/api/app/main.py`](apps/api/app/main.py)                                         |
+| Conversation engine      | [`apps/api/app/agent/agent.py`](apps/api/app/agent/agent.py)                           |
+| State and validation     | [`apps/api/app/agent/state.py`](apps/api/app/agent/state.py)                           |
+| Escalation and redaction | [`apps/api/app/agent/escalation.py`](apps/api/app/agent/escalation.py)                 |
+| Handoff context          | [`apps/api/app/services/handoff_service.py`](apps/api/app/services/handoff_service.py) |
+| Synthetic journey        | [`data/journeys/energy_demo.json`](data/journeys/energy_demo.json)                     |
+
+The diagrams below are rendered by GitHub. The expandable sections keep the README easy to scan while allowing a deeper technical walkthrough.
+
 ## Architecture
 
-```text
-Next.js dashboard
-	|  microphone WAV + browser speech synthesis
-	v
-FastAPI API
-	|  validates audio and calls local faster-whisper
-	v
-RecoveryAgent
-	|  state, escalation, tools, validation
-	+--> SQLite local persistence
-	+--> synthetic journey completion
-	+--> deterministic handoff context
+```mermaid
+flowchart TB
+	CUSTOMER[Customer]
+
+	subgraph CLIENT[Client layer]
+		DASHBOARD[Next.js dashboard]
+		CAPTURE[Microphone capture<br/>Web Audio + AudioWorklet]
+		PLAYBACK[Speech playback<br/>browser speechSynthesis]
+	end
+
+	subgraph SERVER[FastAPI application]
+		ROUTE[Voice API route<br/>validate WAV request]
+		TRANSCRIBE[SpeechService<br/>local faster-whisper]
+		AGENT[RecoveryAgent<br/>conversation coordinator]
+		CONTROL[State, tools, validation<br/>and escalation rules]
+		MODEL[LLM adapter<br/>mock by default]
+		HANDOFF[HandoffService<br/>structured human context]
+		JOURNEY[Synthetic journey service]
+	end
+
+	subgraph DATA[Local data layer]
+		SQL[(SQLite)]
+		DEFINITION[Journey definition<br/>energy_demo.json]
+		RESULT[Completion result<br/>synthetic export]
+	end
+
+	CUSTOMER --> DASHBOARD
+	DASHBOARD --> CAPTURE
+	CAPTURE -->|WAV audio turn| ROUTE
+	ROUTE --> TRANSCRIBE -->|text + confidence| AGENT
+	AGENT --> CONTROL
+	AGENT --> MODEL
+	CONTROL --> SQL
+	CONTROL --> DEFINITION
+	CONTROL --> JOURNEY --> RESULT
+	CONTROL --> HANDOFF --> DASHBOARD
+	AGENT -->|next response| PLAYBACK --> CUSTOMER
+
+	classDef client fill:#e8f1ff,stroke:#2f6fbd,color:#102a43;
+	classDef server fill:#e9f8f2,stroke:#23855b,color:#12372a;
+	classDef data fill:#fff4df,stroke:#c47f16,color:#4a2d05;
+	class CUSTOMER,DASHBOARD,CAPTURE,PLAYBACK client;
+	class ROUTE,TRANSCRIBE,AGENT,CONTROL,MODEL,HANDOFF,JOURNEY server;
+	class SQL,DEFINITION,RESULT data;
 ```
+
+<details>
+<summary><strong>Read the architecture from left to right</strong></summary>
+
+1. The customer speaks through the Next.js dashboard.
+2. The browser captures a WAV turn and sends it to the FastAPI voice route.
+3. `SpeechService` returns text and confidence from local `faster-whisper`.
+4. `RecoveryAgent` coordinates state, extraction, validation, escalation, and response.
+5. SQLite stores the call and the dashboard displays progress or handoff context.
+
+</details>
 
 The browser owns microphone capture and speech playback. FastAPI owns the call lifecycle. The AI/model layer helps understand language, while deterministic backend code controls consent, field order, validation, payment safety, DNC, completion, and escalation.
 
@@ -122,18 +180,101 @@ Available scenarios:
 | `low_confidence`            | Uncertain answer handling                         |
 | `dnc`                       | Blocked lead before call start                    |
 
-## Voice Flow
+## End-To-End Voice Flow
 
-```text
-Customer speaks
-	-> browser captures audio
-	-> PCM16 WAV turn is uploaded to FastAPI
-	-> local faster-whisper returns text and confidence
-	-> RecoveryAgent checks state and safety rules
-	-> extractor identifies the current field value
-	-> backend validates and saves the value
-	-> browser speaks the next response
+```mermaid
+flowchart TD
+	A[1. Customer speaks] --> B[2. Browser captures audio]
+	B --> C[3. Browser creates PCM16 WAV]
+	C --> D[4. POST audio turn to FastAPI]
+	D --> E[5. Validate WAV size and format]
+	E --> F[6. Transcribe with local faster-whisper]
+	F --> G[7. RecoveryAgent receives text + confidence]
+	G --> H[8. Check state and safety rules]
+	H --> I[9. Extract current field value]
+	I --> J[10. Validate and save value]
+	J --> K[11. Ask next question or confirm completion]
+	K --> L[12. Browser speaks response]
+	L --> A
 ```
+
+<details>
+<summary><strong>What happens when something goes wrong?</strong></summary>
+
+The same flow can exit early. A human request, payment language, anger, unsupported advice request, sensitive topic, repeated misunderstanding, or low confidence moves the call to `HANDOFF`. The backend creates a deterministic context and the dashboard shows the reason, transcript, collected fields, and remaining fields.
+
+</details>
+
+## Conversation State Flow
+
+```mermaid
+stateDiagram-v2
+	[*] --> CONSENT_REQUIRED: start call
+	CONSENT_REQUIRED --> COLLECTING: affirmative consent
+	CONSENT_REQUIRED --> ENDED: decline or stop
+	CONSENT_REQUIRED --> HANDOFF: human / unsafe / unsupported request
+	COLLECTING --> COLLECTING: valid field saved
+	COLLECTING --> CONFIRMING: field needs confirmation
+	COLLECTING --> HANDOFF: low confidence / repeated failure / safety signal
+	CONFIRMING --> COLLECTING: correction or confirmed field
+	CONFIRMING --> COMPLETING: all fields confirmed
+	COMPLETING --> COMPLETED: synthetic submission succeeds
+	COLLECTING --> HANDOFF: explicit human request
+	CONFIRMING --> HANDOFF: explicit human request
+	COMPLETED --> [*]
+	HANDOFF --> [*]
+	ENDED --> [*]
+```
+
+<details>
+<summary><strong>Why the state flow matters</strong></summary>
+
+The model does not get to skip from speech directly to completion. Consent, field order, validation, confirmation, and terminal states are guarded by `ConversationState` and the backend agent.
+
+</details>
+
+## Decision Flows
+
+### Normal completion path
+
+```mermaid
+flowchart TD
+	START[Call starts] --> DISCLOSURE[Recording disclosure]
+	DISCLOSURE --> CONSENT{Customer consents?}
+	CONSENT -->|Yes| NEXT[Find next missing field]
+	NEXT --> ASK[Ask configured question]
+	ASK --> ANSWER[Customer answers]
+	ANSWER --> EXTRACT[Extract current field value]
+	EXTRACT --> VALIDATE{Value is valid?}
+	VALIDATE -->|No| RETRY[Explain format and ask again]
+	RETRY --> ANSWER
+	VALIDATE -->|Yes| SAVE[Save value]
+	SAVE --> MORE{More fields?}
+	MORE -->|Yes| NEXT
+	MORE -->|No| CONFIRM[Ask for final confirmation]
+	CONFIRM --> COMPLETE[Submit synthetic journey]
+	COMPLETE --> DONE[COMPLETED]
+```
+
+### Safety and escalation path
+
+```mermaid
+flowchart TD
+	INPUT[Customer text + ASR confidence] --> CHECK{Safe for automation?}
+	CHECK -->|Payment, human request,<br/>anger, advice, sensitive topic| HANDOFF[Prepare warm handoff]
+	CHECK -->|No safety signal| UNDERSTAND{Answer understood<br/>and grounded?}
+	UNDERSTAND -->|No| UNCERTAIN[Ask again or escalate]
+	UNDERSTAND -->|Yes| VALIDATE{Passes field validation?}
+	VALIDATE -->|No| RETRY[Retry with clear format]
+	VALIDATE -->|Yes| CONTINUE[Continue journey]
+	UNCERTAIN -->|Repeated failure or low confidence| HANDOFF
+	RETRY --> CONTINUE
+	CONTINUE --> NEXT[Ask next question]
+	HANDOFF --> CONTEXT[Store reason, progress,<br/>transcript, and remaining fields]
+	CONTEXT --> DASHBOARD[Show context on dashboard]
+```
+
+The normal path explains how a suitable call completes. The safety path explains how the system stops automation instead of guessing or forcing the customer to continue.
 
 The voice flow is designed for local demonstration. It is not a replacement for production telephony, identity, payment, compliance, or human-transfer integrations.
 
@@ -223,9 +364,6 @@ npm --prefix apps/web run test:voice
 The browser tests use synthetic speech audio and virtual microphone streams. They validate the capture and API path but do not represent every physical microphone, browser, accent, network, or phone condition.
 
 ## Documentation
-
-- [Evaluation round speaking guide](EVALUATION_ROUND_GUIDE.md)
-- [Evaluation guide PDF](EVALUATION_ROUND_GUIDE.pdf)
 - [Architecture decisions, tradeoffs, and accuracy](decisions.md)
 
 ## Accuracy And Scope
